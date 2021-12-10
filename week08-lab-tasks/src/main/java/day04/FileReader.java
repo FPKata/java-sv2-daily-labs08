@@ -6,7 +6,7 @@ import java.nio.file.Path;
 import java.util.List;
 
 public class FileReader {
-    private String findSmallestDifference(String file){
+    private String findSmallestTeamDifference(String file){
         try{
             List<String> data = Files.readAllLines(Path.of("src/main/resources/datamunging/" + file));
 
@@ -56,9 +56,9 @@ public class FileReader {
     }
 
     public static void main(String[] args) {
-//        int min = new FileReader().findSmallestTemperatureSpread("weather.dat");
-//        System.out.println(min);
-        String result = new FileReader().findSmallestDifference("football.dat");
+        int minTemperature = new FileReader().findSmallestTemperatureSpread("weather.dat");
+        System.out.println(minTemperature);
+        String result = new FileReader().findSmallestTeamDifference("football.dat");
         System.out.println(result);
     }
 }
