@@ -6,6 +6,31 @@ import java.nio.file.Path;
 import java.util.List;
 
 public class FileReader {
+    private String findSmallestDifference(String file){
+        try{
+            List<String> data = Files.readAllLines(Path.of("src/main/resources/datamunging/" + file));
+
+           int minDifference = Integer.MAX_VALUE;
+           String team = "";
+
+            for (int i = 1; i < data.size();i++){
+                if (i == 18){
+                    i++;
+                }
+                int given = Integer.parseInt(data.get(i).substring(43, 45).trim());
+                int got = Integer.parseInt(data.get(i).substring(50, 52).trim());
+                int actDiff = given - got;
+                if (minDifference > actDiff){
+                    minDifference = actDiff;
+                    team = data.get(i).substring(7, 23).trim();
+                }
+            }
+            return team;
+        }catch(IOException ioe){
+            throw new IllegalStateException("Cannot read file", ioe);
+        }
+    }
+
     private int findSmallestTemperatureSpread(String filename){
        try{
            List<String> lines = Files.readAllLines(Path.of("src/main/resources/datamunging/" + filename));
@@ -31,8 +56,10 @@ public class FileReader {
     }
 
     public static void main(String[] args) {
-        int min = new FileReader().findSmallestTemperatureSpread("weather.dat");
-        System.out.println(min);
+//        int min = new FileReader().findSmallestTemperatureSpread("weather.dat");
+//        System.out.println(min);
+        String result = new FileReader().findSmallestDifference("football.dat");
+        System.out.println(result);
     }
 }
 
