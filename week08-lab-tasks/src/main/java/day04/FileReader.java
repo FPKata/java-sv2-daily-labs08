@@ -10,22 +10,24 @@ public class FileReader {
         try{
             List<String> data = Files.readAllLines(Path.of("src/main/resources/datamunging/" + file));
 
-           int minDifference = Integer.MAX_VALUE;
-           String team = "";
+           int minDifference = 1000;
+           String minTeam = "";
 
-            for (int i = 1; i < data.size();i++){
+            for (int i = 1; i < data.size(); i++){
                 if (i == 18){
                     i++;
                 }
+                String team = data.get(i).substring(7, 23).trim();
                 int given = Integer.parseInt(data.get(i).substring(43, 45).trim());
                 int got = Integer.parseInt(data.get(i).substring(50, 52).trim());
-                int actDiff = given - got;
+
+                int actDiff = Math.abs(given - got);
                 if (minDifference > actDiff){
                     minDifference = actDiff;
-                    team = data.get(i).substring(7, 23).trim();
+                    minTeam = team;
                 }
             }
-            return team;
+            return minTeam;
         }catch(IOException ioe){
             throw new IllegalStateException("Cannot read file", ioe);
         }
