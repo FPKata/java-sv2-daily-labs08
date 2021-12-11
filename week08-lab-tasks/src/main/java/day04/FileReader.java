@@ -3,59 +3,67 @@ package day04;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class FileReader {
-    private String findSmallestTeamDifference(String file){
-        try{
-            List<String> data = Files.readAllLines(Path.of("src/main/resources/datamunging/" + file));
+    public String findSmallestTeamDifference(String filename){
+        List<String> lines = readLines(filename);
+        lines = filterLines(lines, Arrays.asList(0, 18));
+        List<DataWithDifference> data = extractData(lines,
+                new Position(7, 22), new Position(43, 45), new Position(50, 52));
+        return findMin(data).getName();
+    }
 
-           int minDifference = 1000;
-           String minTeam = "";
+    public int findSmallestTemperatureSpread(String filename){
+        List<String> lines = readLines(filename);
+        lines = filterLines(lines, Arrays.asList(0, 1, 32));
+        List<DataWithDifference> data = extractData(lines,
+                new Position(2, 4), new Position(6, 8), new Position(12, 14));
+        return Integer.parseInt(findMin(data).getName());
+    }
 
-            for (int i = 1; i < data.size(); i++){
-                if (i == 18){
-                    i++;
-                }
-                String team = data.get(i).substring(7, 23).trim();
-                int given = Integer.parseInt(data.get(i).substring(43, 45).trim());
-                int got = Integer.parseInt(data.get(i).substring(50, 52).trim());
+     private List<String> readLines(String filename){
+         try {
+             return Files.readAllLines(Path.of("src/test/resources/datamunging/" + filename));
+         } catch (IOException ioe) {
+             throw new IllegalStateException("Cannot read file", ioe);
+         }
+     }
 
-                int actDiff = Math.abs(given - got);
-                if (minDifference > actDiff){
-                    minDifference = actDiff;
-                    minTeam = team;
-                }
+     private List<String> filterLines(List<String> lines, List<Integer> filtered){
+        List<String> result = new ArrayList<>();
+        for (int i = 0; i < lines.size(); i++){
+            if (!filtered.contains(i)){
+                result.add(lines.get(i));
             }
-            return minTeam;
-        }catch(IOException ioe){
-            throw new IllegalStateException("Cannot read file", ioe);
         }
-    }
+        return result;
+     }
 
-    private int findSmallestTemperatureSpread(String filename){
-       try{
-           List<String> lines = Files.readAllLines(Path.of("src/main/resources/datamunging/" + filename));
+     private List<DataWithDifference> extractData(List<String> lines, Position namePosition,
+                                                  Position value1Position, Position value2Position){
+        List<DataWithDifference> result = new ArrayList<>();
+        for (String actual : lines){
+            String name = namePosition.getAsString(actual);
+            int value1 = value1Position.getAsInt(actual);
+            int value2 = value2Position.getAsInt(actual);
 
-           int minSpread = 100;
-           int minDay = 0;
+            result.add(new DataWithDifference(name, value1, value2));
+        }
+        return result;
+     }
 
-           for (int i = 2; i < lines.size() - 1; i++){
-               int day = Integer.parseInt(lines.get(i).substring(2, 4).trim());
-               int max = Integer.parseInt(lines.get(i).substring(6, 8).trim());
-               int min = Integer.parseInt(lines.get(i).substring(12, 14).trim());
-
-               int spread = max - min;
-               if (minSpread > spread){
-                   minSpread = spread;
-                   minDay = day;
-               }
-           }
-           return minDay;
-       }catch(IOException ioe){
-           throw  new IllegalStateException("Cannot read file", ioe);
-       }
-    }
+     private DataWithDifference findMin(List<DataWithDifference> data){
+        DataWithDifference min = data.get(0);
+        for (DataWithDifference item : data){
+            if (min.getDifference() > item.getDifference()){
+                min = item;
+            }
+        }
+        return min;
+     }
 
     public static void main(String[] args) {
         int minTemperature = new FileReader().findSmallestTemperatureSpread("weather.dat");
